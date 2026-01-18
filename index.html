@@ -1,20 +1,10 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Lumen Christi Snake</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mobile Snake - Lumen Christi</title>
   <style>
-    :root{
-      --bg:#000000;
-      --panel:#0f0f0f;
-      --panel2:#141414;
-      --gold:#d4af37;     /* premium gold */
-      --gold2:#FFD400;    /* bright yellow-gold */
-      --text:#f2e6b5;
-      --border:rgba(212,175,55,.45);
-    }
-
     *{
       margin:0;padding:0;box-sizing:border-box;
       -webkit-tap-highlight-color:transparent;
@@ -24,10 +14,19 @@
     html,body{
       height:100%;
       overflow:hidden;
-      background:var(--bg);
+      background:#000;
       font-family:monospace,system-ui,sans-serif;
-      color:var(--gold2);
+      color:#D4AF37;
       touch-action:none;
+    }
+
+    :root{
+      --bg:#000000;
+      --panel:#0f0f10;
+      --panel2:#121214;
+      --gold:#D4AF37;        /* premium gold */
+      --goldBright:#FFD400;  /* brighter accent */
+      --border:rgba(212,175,55,.35);
     }
 
     #container{
@@ -38,55 +37,42 @@
       padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
 
-    /* Brand header */
     #brandBar{
-      background:linear-gradient(180deg, #0b0b0b, #000);
       display:flex;
       justify-content:center;
       align-items:center;
       padding:10px 10px 6px;
-      border-bottom:1px solid rgba(255,212,0,.12);
+      background:var(--bg);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      gap:10px;
     }
-    #brandBar img{
-      max-width:170px;
+    #brandLogo{
+      max-width:175px;
       height:auto;
-      filter: drop-shadow(0 2px 8px rgba(212,175,55,.25));
+      display:block;
+      filter: drop-shadow(0 0 10px rgba(212,175,55,.18));
     }
 
-    #scoreWrap{
-      background:var(--panel);
-      border-bottom:1px solid rgba(255,212,0,.12);
+    #scoreContainer{
       text-align:center;
-      padding:8px 10px 10px;
-    }
-    #hint{
-      font-size:0.9rem;
-      opacity:.9;
-      color:var(--gold);
-      margin-bottom:6px;
-    }
-    #scoreRow{
-      display:flex;
-      justify-content:center;
-      gap:14px;
-      flex-wrap:wrap;
+      padding:10px 10px 6px;
+      font-size:1.45rem;
       font-weight:900;
+      background:var(--panel);
       letter-spacing:1px;
-      font-size:1.35rem;
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    #scoreRow span.label{
-      opacity:.9;
-      color:var(--text);
-      font-weight:800;
-      letter-spacing:.5px;
-    }
+
     #promoText{
-      margin-top:6px;
+      text-align:center;
       font-size:0.92rem;
+      padding:8px 12px 10px;
+      background:var(--panel2);
       color:var(--gold);
-      line-height:1.25;
+      line-height:1.3;
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    #promoText strong{ color:var(--gold2); }
+    #promoText strong{ color: var(--goldBright); }
 
     #canvasWrapper{
       flex:1;
@@ -96,9 +82,8 @@
       position:relative;
       overflow:hidden;
       padding:8px;
-      background:radial-gradient(ellipse at top, rgba(212,175,55,.06), transparent 55%);
+      background:var(--bg);
     }
-
     canvas{
       display:block;
       background:#000;
@@ -106,8 +91,7 @@
       max-height:100%;
       image-rendering:pixelated;
       touch-action:none;
-      border:1px solid rgba(212,175,55,.25);
-      border-radius:10px;
+      border:1px solid var(--border);
     }
 
     #landscapeWarning{
@@ -115,12 +99,12 @@
       position:absolute;
       inset:0;
       background:rgba(0,0,0,.92);
-      color:var(--gold2);
+      color:var(--goldBright);
       justify-content:center;
       align-items:center;
       text-align:center;
       padding:20px;
-      font-size:1.25rem;
+      font-size:1.2rem;
       z-index:20;
       pointer-events:auto;
     }
@@ -133,8 +117,8 @@
       justify-content:center;
       align-items:center;
       flex-direction:column;
-      color:var(--gold2);
-      font-size:2.1rem;
+      color:var(--goldBright);
+      font-size:2.0rem;
       font-weight:900;
       text-align:center;
       z-index:15;
@@ -143,19 +127,28 @@
     }
     #overlaySub{
       font-size:1.05rem;
-      margin-top:12px;
+      margin-top:14px;
       color:var(--gold);
-      font-weight:800;
+      font-weight:700;
+      line-height:1.35;
+      white-space:pre-line;
+    }
+    #overlayTiny{
+      margin-top:10px;
+      font-size:0.78rem;
+      opacity:.75;
+      color:rgba(212,175,55,.85);
+      font-weight:700;
     }
 
     #controls{
-      background:var(--panel2);
-      border-top:1px solid rgba(255,212,0,.12);
       display:flex;
       flex-direction:column;
       align-items:center;
-      padding:12px 14px;
+      padding:10px 14px;
+      background:var(--panel);
       gap:10px;
+      border-top:1px solid rgba(255,255,255,.06);
     }
     .dpadRow{
       display:flex;
@@ -164,42 +157,53 @@
     }
     .dpadBtn{
       width:70px;height:70px;
-      background:#1b1b1b;
-      color:var(--gold2);
-      border:2px solid var(--border);
-      border-radius:14px;
-      font-size:1.85rem;
+      background:#161617;
+      color:var(--goldBright);
+      border:2px solid var(--gold);
+      border-radius:12px;
+      font-size:1.9rem;
       display:flex;
       justify-content:center;
       align-items:center;
       touch-action:manipulation;
+      box-shadow: 0 0 14px rgba(212,175,55,.08);
     }
-    .dpadBtn:active{ background:#262626; }
+    .dpadBtn:active{ background:#222; }
+
+    #finePrint{
+      text-align:center;
+      font-size:0.72rem;
+      padding:6px 10px;
+      background:var(--panel2);
+      color:rgba(212,175,55,.70);
+      border-top:1px solid rgba(255,255,255,.06);
+    }
 
     @media (max-height:720px){
-      #brandBar img{ max-width:150px; }
-      #scoreRow{ font-size:1.25rem; }
-      #promoText{ font-size:0.88rem; }
-      .dpadBtn{ width:64px;height:64px;font-size:1.65rem; }
-      #controls{ padding:10px 12px; gap:8px; }
+      #scoreContainer{font-size:1.28rem;}
+      #promoText{font-size:0.86rem;padding:7px 10px 9px;}
+      .dpadBtn{width:64px;height:64px;font-size:1.7rem;}
+      #controls{padding:9px 12px;gap:8px;}
+      #brandLogo{max-width:155px;}
     }
   </style>
 </head>
 <body>
   <div id="container">
+
     <div id="brandBar">
-      <img id="brandLogo" alt="Lumen Christi Medical Ltd">
+      <img id="brandLogo" alt="Lumen Christi Medical Ltd" src="data:image/png;base64,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" />
     </div>
 
-    <div id="scoreWrap">
-      <div id="hint">Use portrait mode • Swipe on the game or use the arrows</div>
-      <div id="scoreRow">
-        <div><span class="label">SCORE:</span> <span id="score">0</span></div>
-        <div><span class="label">HIGH:</span> <span id="highScore">0</span></div>
-      </div>
-      <div id="promoText">
-        Screenshot a <strong>high score of 200</strong> for a <strong>20% discount</strong> on your next visit!
-      </div>
+    <div id="scoreContainer">
+      SCORE: <span id="score">0</span>
+      &nbsp;&nbsp;•&nbsp;&nbsp;
+      HIGH: <span id="highScore">0</span>
+    </div>
+
+    <div id="promoText">
+      Screenshot a <strong>high score of 200</strong><br>
+      and get <strong>20% OFF</strong> your next visit!
     </div>
 
     <div id="canvasWrapper">
@@ -210,6 +214,7 @@
       <div id="overlay">
         <div id="overlayText">GAME OVER</div>
         <div id="overlaySub">Tap to Restart</div>
+        <div id="overlayTiny"></div>
       </div>
     </div>
 
@@ -223,18 +228,340 @@
         <div class="dpadBtn" id="rightBtn" aria-label="Right">→</div>
       </div>
     </div>
+
+    <div id="finePrint">
+      Offer subject to terms • One screenshot per visit
+    </div>
+
   </div>
 
   <script>
     (function(){
       "use strict";
 
-      // Embedded logo (no separate file needed)
-      const logoBase64 =
-        "iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAz1BMVEUTDA4AAACko6MgGxwAAAgAAAUAAAsRCg4AAAMOBw3nwne6m1S+n1gJAAsMBAzLqmKoi0VIOyiRdzDXtW2zlE6YfTijhz5vWiWDbT7Vs2/fvHKjiFWBa0JjUCWmiUTIp2AgGBFkUjI0KRWojVVI" +
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-      // NOTE: the full base64 is injected below so it always works:
-      document.getElementById("brandLogo").src = "data:image/png;base64," + (
-        "iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAz1BMVEUTDA4AAACko6MgGxwAAAgAAAUAAAsRCg4AAAMOBw3nwne6m1S+n1gJAAsMBAzLqmKoi0VIOyiRdzDXtW2zlE6YfTijhz5vWiWDbT7Vs2/fvHKjiFWBa0JjUCWmiUTIp2AgGBFkUjI0KRWojVVI" +
-        "o8bCqQAAAACXBIWXMAAAsSAAALEgHS3X78AAAIcElEQVR4nO2dC3ubOhCGpWkYJcDg0cKk1V8v2v//2o6aQq2lW2k2QmQ0hZbZbqCqgGJxv0kQxZQyKp7bQ3b5k2vXh6wHc8vP7w1g3w3m2zSxXxq5p8hG3r8cYd7cQmJ7E5oJxv0oWcB9d1Y1f0v9m7b8yq9pVd2zJYjZVQ3a8bYV2rS2q0Qv7i8mQm+gqYQqkXk6y0aYpQY0u0h4m0mC6G0x9fQq7v7Fh1G0dYp6o2bY1uQ2mYQm8bq0m0d0bJw2o0k9jQkJxw2bYgWc8Ew5Q1nQ3n6mTz8qf8OqGQm0uE8m8m6kYv1H0cQz5m3q+QxgQyqkq0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d", { alpha:false });
+
+      const scoreEl = document.getElementById("score");
+      const highScoreEl = document.getElementById("highScore");
+
+      const overlay = document.getElementById("overlay");
+      const overlayText = document.getElementById("overlayText");
+      const overlaySub = document.getElementById("overlaySub");
+      const overlayTiny = document.getElementById("overlayTiny");
+
+      const landscapeWarning = document.getElementById("landscapeWarning");
+
+      const upBtn = document.getElementById("upBtn");
+      const downBtn = document.getElementById("downBtn");
+      const leftBtn = document.getElementById("leftBtn");
+      const rightBtn = document.getElementById("rightBtn");
+
+      const GOLD = "#D4AF37";
+      const GOLD_BRIGHT = "#FFD400";
+
+      const CELL = 20;
+      let gridW = 0, gridH = 0, dpr = 1;
+
+      let snake = [];
+      let food = {x:0,y:0};
+      let dir = {x:1,y:0};
+      let queued = {x:1,y:0};
+      let turnLocked = false;
+
+      let score = 0;
+      let highScore = 0;
+      let gameOver = false;
+
+      const BASE_SPEED = 10;
+      const SPEED_INC = 0.5;
+      const MAX_SPEED  = 20;
+      let speed = BASE_SPEED;
+
+      let lastT = 0;
+      let acc = 0;
+
+      function isLandscape(){
+        return window.innerWidth > window.innerHeight;
+      }
+
+      function showOverlay(on, title, sub){
+        overlay.style.display = on ? "flex" : "none";
+        if (title) overlayText.textContent = title;
+        if (sub) overlaySub.textContent = sub;
+      }
+
+      function loadHighScore(){
+        const v = Number(localStorage.getItem("snakeHighScore") || "0");
+        highScore = Number.isFinite(v) ? v : 0;
+        highScoreEl.textContent = String(highScore);
+      }
+
+      function saveHighScoreIfNeeded(){
+        if (score > highScore){
+          highScore = score;
+          localStorage.setItem("snakeHighScore", String(highScore));
+          highScoreEl.textContent = String(highScore);
+          return true;
+        }
+        return false;
+      }
+
+      function resize(){
+        const wrap = document.getElementById("canvasWrapper");
+
+        const land = isLandscape();
+        landscapeWarning.style.display = land ? "flex" : "none";
+        canvas.style.display = land ? "none" : "block";
+
+        const usable = Math.min(wrap.clientWidth, wrap.clientHeight);
+        const cssSize = Math.max(240, Math.floor(usable));
+        const cells = Math.max(15, Math.floor(cssSize / CELL));
+
+        gridW = cells;
+        gridH = cells;
+
+        dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+        canvas.style.width = (gridW * CELL) + "px";
+        canvas.style.height = (gridH * CELL) + "px";
+        canvas.width = Math.floor(gridW * CELL * dpr);
+        canvas.height = Math.floor(gridH * CELL * dpr);
+
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.scale(dpr,dpr);
+
+        reset();
+      }
+
+      function initSnake(){
+        const sx = Math.floor(gridW/2);
+        const sy = Math.floor(gridH/2);
+        snake = [
+          {x:sx, y:sy},
+          {x:sx-1, y:sy},
+          {x:sx-2, y:sy}
+        ];
+      }
+
+      function placeFood(){
+        const occ = new Set(snake.map(s => s.x + "," + s.y));
+        const empties = [];
+        for (let x=0; x<gridW; x++){
+          for (let y=0; y<gridH; y++){
+            const k = x + "," + y;
+            if (!occ.has(k)) empties.push({x,y});
+          }
+        }
+        if (empties.length === 0){
+          gameOver = true;
+          showOverlay(true, "YOU WIN!", "Tap to Restart");
+          overlayTiny.textContent = "";
+          return;
+        }
+        food = empties[(Math.random() * empties.length) | 0];
+      }
+
+      function reset(){
+        if (!gridW || !gridH) return;
+
+        score = 0;
+        scoreEl.textContent = "0";
+
+        dir = {x:1,y:0};
+        queued = {x:1,y:0};
+        turnLocked = false;
+
+        speed = BASE_SPEED;
+        gameOver = false;
+        showOverlay(false);
+        overlayTiny.textContent = "";
+
+        initSnake();
+        placeFood();
+
+        acc = 0;
+        lastT = performance.now();
+
+        draw();
+      }
+
+      function setDir(nd){
+        if (gameOver) return;
+        if (turnLocked) return;
+
+        if (nd.x === -dir.x && nd.y === -dir.y) return;
+        if (nd.x === dir.x && nd.y === dir.y) return;
+
+        queued = {x:nd.x, y:nd.y};
+        turnLocked = true;
+      }
+
+      function endGame(){
+        gameOver = true;
+
+        const newBest = saveHighScoreIfNeeded();
+
+        showOverlay(true, "GAME OVER", "Score " + score + " • Tap to Restart");
+
+        if (score >= 200){
+          overlaySub.textContent = "🎉 Screenshot this score for 20% OFF!\nTap to Restart";
+        }
+
+        overlayTiny.textContent = newBest ? "New High Score Saved ✅" : ("High Score: " + highScore);
+      }
+
+      function step(){
+        if (gameOver) return;
+        if (!snake.length) return;
+
+        dir = {x:queued.x, y:queued.y};
+
+        const head = snake[0];
+        let nx = head.x + dir.x;
+        let ny = head.y + dir.y;
+
+        if (nx < 0) nx = gridW - 1;
+        if (nx >= gridW) nx = 0;
+        if (ny < 0) ny = gridH - 1;
+        if (ny >= gridH) ny = 0;
+
+        const willEat = (nx === food.x && ny === food.y);
+
+        const checkLen = willEat ? snake.length : snake.length - 1;
+        for (let i=0; i<checkLen; i++){
+          if (snake[i].x === nx && snake[i].y === ny){
+            endGame();
+            return;
+          }
+        }
+
+        snake.unshift({x:nx, y:ny});
+
+        if (willEat){
+          score++;
+          scoreEl.textContent = String(score);
+          if (score % 5 === 0 && speed < MAX_SPEED){
+            speed = Math.min(MAX_SPEED, speed + SPEED_INC);
+          }
+          placeFood();
+        } else {
+          snake.pop();
+        }
+
+        turnLocked = false;
+      }
+
+      function draw(){
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0,0,gridW*CELL, gridH*CELL);
+
+        ctx.save();
+        ctx.fillStyle = GOLD_BRIGHT;
+        ctx.shadowColor = GOLD_BRIGHT;
+        ctx.shadowBlur = 10;
+        const fx = food.x * CELL + CELL/2;
+        const fy = food.y * CELL + CELL/2;
+        ctx.beginPath();
+        ctx.arc(fx, fy, CELL/2 - 2, 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.fillStyle = GOLD;
+        ctx.shadowColor = GOLD;
+        ctx.shadowBlur = 8;
+        for (let i=0; i<snake.length; i++){
+          const s = snake[i];
+          ctx.fillRect(s.x*CELL+1, s.y*CELL+1, CELL-2, CELL-2);
+        }
+        ctx.restore();
+      }
+
+      function loop(t){
+        requestAnimationFrame(loop);
+
+        if (isLandscape()){
+          draw();
+          return;
+        }
+
+        if (!lastT) lastT = t;
+        let dt = (t - lastT)/1000;
+        lastT = t;
+
+        if (dt > 0.25) dt = 0.25;
+
+        acc += dt;
+        if (acc > 0.2) acc = 0.2;
+
+        const stepTime = 1 / speed;
+        while (acc >= stepTime){
+          step();
+          acc -= stepTime;
+        }
+
+        draw();
+      }
+
+      function bindPress(el, fn){
+        el.addEventListener("pointerdown", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          fn();
+        }, { passive:false });
+      }
+
+      bindPress(upBtn,    () => setDir({x:0,y:-1}));
+      bindPress(downBtn,  () => setDir({x:0,y: 1}));
+      bindPress(leftBtn,  () => setDir({x:-1,y:0}));
+      bindPress(rightBtn, () => setDir({x: 1,y:0}));
+
+      overlay.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        reset();
+      }, { passive:false });
+
+      let start = null;
+      canvas.addEventListener("pointerdown", (e) => {
+        if (gameOver){
+          e.preventDefault();
+          reset();
+          return;
+        }
+        start = {x:e.clientX, y:e.clientY};
+      }, { passive:false });
+
+      canvas.addEventListener("pointerup", (e) => {
+        if (!start) return;
+        const end = {x:e.clientX, y:e.clientY};
+        const dx = end.x - start.x;
+        const dy = end.y - start.y;
+        start = null;
+
+        const min = 30;
+        if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > min){
+          setDir({x: dx > 0 ? 1 : -1, y:0});
+        } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > min){
+          setDir({x:0, y: dy > 0 ? 1 : -1});
+        }
+      }, { passive:false });
+
+      canvas.addEventListener("pointermove", (e) => e.preventDefault(), { passive:false });
+      document.addEventListener("touchmove", (e) => e.preventDefault(), { passive:false });
+
+      let rTimer = null;
+      window.addEventListener("resize", () => {
+        clearTimeout(rTimer);
+        rTimer = setTimeout(resize, 80);
+      });
+      window.addEventListener("orientationchange", () => setTimeout(resize, 120));
+
+      loadHighScore();
+      resize();
+      reset();
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
