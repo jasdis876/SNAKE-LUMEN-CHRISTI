@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lumen Christi Snake</title>
+  <style>
+    :root{
+      --bg:#000000;
+      --panel:#0f0f0f;
+      --panel2:#141414;
+      --gold:#d4af37;     /* premium gold */
+      --gold2:#FFD400;    /* bright yellow-gold */
+      --text:#f2e6b5;
+      --border:rgba(212,175,55,.45);
+    }
+
+    *{
+      margin:0;padding:0;box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
+      -webkit-touch-callout:none;
+      -webkit-user-select:none;user-select:none;
+    }
+    html,body{
+      height:100%;
+      overflow:hidden;
+      background:var(--bg);
+      font-family:monospace,system-ui,sans-serif;
+      color:var(--gold2);
+      touch-action:none;
+    }
+
+    #container{
+      display:flex;
+      flex-direction:column;
+      height:100%;
+      width:100%;
+      padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    /* Brand header */
+    #brandBar{
+      background:linear-gradient(180deg, #0b0b0b, #000);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:10px 10px 6px;
+      border-bottom:1px solid rgba(255,212,0,.12);
+    }
+    #brandBar img{
+      max-width:170px;
+      height:auto;
+      filter: drop-shadow(0 2px 8px rgba(212,175,55,.25));
+    }
+
+    #scoreWrap{
+      background:var(--panel);
+      border-bottom:1px solid rgba(255,212,0,.12);
+      text-align:center;
+      padding:8px 10px 10px;
+    }
+    #hint{
+      font-size:0.9rem;
+      opacity:.9;
+      color:var(--gold);
+      margin-bottom:6px;
+    }
+    #scoreRow{
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+      font-weight:900;
+      letter-spacing:1px;
+      font-size:1.35rem;
+    }
+    #scoreRow span.label{
+      opacity:.9;
+      color:var(--text);
+      font-weight:800;
+      letter-spacing:.5px;
+    }
+    #promoText{
+      margin-top:6px;
+      font-size:0.92rem;
+      color:var(--gold);
+      line-height:1.25;
+    }
+    #promoText strong{ color:var(--gold2); }
+
+    #canvasWrapper{
+      flex:1;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      position:relative;
+      overflow:hidden;
+      padding:8px;
+      background:radial-gradient(ellipse at top, rgba(212,175,55,.06), transparent 55%);
+    }
+
+    canvas{
+      display:block;
+      background:#000;
+      max-width:100%;
+      max-height:100%;
+      image-rendering:pixelated;
+      touch-action:none;
+      border:1px solid rgba(212,175,55,.25);
+      border-radius:10px;
+    }
+
+    #landscapeWarning{
+      display:none;
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.92);
+      color:var(--gold2);
+      justify-content:center;
+      align-items:center;
+      text-align:center;
+      padding:20px;
+      font-size:1.25rem;
+      z-index:20;
+      pointer-events:auto;
+    }
+
+    #overlay{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.86);
+      display:none;
+      justify-content:center;
+      align-items:center;
+      flex-direction:column;
+      color:var(--gold2);
+      font-size:2.1rem;
+      font-weight:900;
+      text-align:center;
+      z-index:15;
+      padding:20px;
+      pointer-events:auto;
+    }
+    #overlaySub{
+      font-size:1.05rem;
+      margin-top:12px;
+      color:var(--gold);
+      font-weight:800;
+    }
+
+    #controls{
+      background:var(--panel2);
+      border-top:1px solid rgba(255,212,0,.12);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:12px 14px;
+      gap:10px;
+    }
+    .dpadRow{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+    }
+    .dpadBtn{
+      width:70px;height:70px;
+      background:#1b1b1b;
+      color:var(--gold2);
+      border:2px solid var(--border);
+      border-radius:14px;
+      font-size:1.85rem;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      touch-action:manipulation;
+    }
+    .dpadBtn:active{ background:#262626; }
+
+    @media (max-height:720px){
+      #brandBar img{ max-width:150px; }
+      #scoreRow{ font-size:1.25rem; }
+      #promoText{ font-size:0.88rem; }
+      .dpadBtn{ width:64px;height:64px;font-size:1.65rem; }
+      #controls{ padding:10px 12px; gap:8px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="brandBar">
+      <img id="brandLogo" alt="Lumen Christi Medical Ltd">
+    </div>
+
+    <div id="scoreWrap">
+      <div id="hint">Use portrait mode • Swipe on the game or use the arrows</div>
+      <div id="scoreRow">
+        <div><span class="label">SCORE:</span> <span id="score">0</span></div>
+        <div><span class="label">HIGH:</span> <span id="highScore">0</span></div>
+      </div>
+      <div id="promoText">
+        Screenshot a <strong>high score of 200</strong> for a <strong>20% discount</strong> on your next visit!
+      </div>
+    </div>
+
+    <div id="canvasWrapper">
+      <canvas id="gameCanvas"></canvas>
+
+      <div id="landscapeWarning">📱 Please rotate to portrait mode to play!</div>
+
+      <div id="overlay">
+        <div id="overlayText">GAME OVER</div>
+        <div id="overlaySub">Tap to Restart</div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <div class="dpadRow">
+        <div class="dpadBtn" id="upBtn" aria-label="Up">↑</div>
+      </div>
+      <div class="dpadRow">
+        <div class="dpadBtn" id="leftBtn" aria-label="Left">←</div>
+        <div class="dpadBtn" id="downBtn" aria-label="Down">↓</div>
+        <div class="dpadBtn" id="rightBtn" aria-label="Right">→</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      "use strict";
+
+      // Embedded logo (no separate file needed)
+      const logoBase64 =
+        "iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAz1BMVEUTDA4AAACko6MgGxwAAAgAAAUAAAsRCg4AAAMOBw3nwne6m1S+n1gJAAsMBAzLqmKoi0VIOyiRdzDXtW2zlE6YfTijhz5vWiWDbT7Vs2/fvHKjiFWBa0JjUCWmiUTIp2AgGBFkUjI0KRWojVVI" +
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" +
+        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+      // NOTE: the full base64 is injected below so it always works:
+      document.getElementById("brandLogo").src = "data:image/png;base64," + (
+        "iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAz1BMVEUTDA4AAACko6MgGxwAAAgAAAUAAAsRCg4AAAMOBw3nwne6m1S+n1gJAAsMBAzLqmKoi0VIOyiRdzDXtW2zlE6YfTijhz5vWiWDbT7Vs2/fvHKjiFWBa0JjUCWmiUTIp2AgGBFkUjI0KRWojVVI" +
+        "o8bCqQAAAACXBIWXMAAAsSAAALEgHS3X78AAAIcElEQVR4nO2dC3ubOhCGpWkYJcDg0cKk1V8v2v//2o6aQq2lW2k2QmQ0hZbZbqCqgGJxv0kQxZQyKp7bQ3b5k2vXh6wHc8vP7w1g3w3m2zSxXxq5p8hG3r8cYd7cQmJ7E5oJxv0oWcB9d1Y1f0v9m7b8yq9pVd2zJYjZVQ3a8bYV2rS2q0Qv7i8mQm+gqYQqkXk6y0aYpQY0u0h4m0mC6G0x9fQq7v7Fh1G0dYp6o2bY1uQ2mYQm8bq0m0d0bJw2o0k9jQkJxw2bYgWc8Ew5Q1nQ3n6mTz8qf8OqGQm0uE8m8m6kYv1H0cQz5m3q+QxgQyqkq0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o0m5o0q5o
